@@ -66,22 +66,6 @@ class ExtensionInterface(abc.ABC):
     """
 
     @abc.abstractmethod
-    def setup(self, config: Dict[str, Any]) -> None:
-        """
-        Initializes the extension with its specific configuration.
-
-        This method is called once by the framework when the extension is loaded.
-        It should be used to store API keys, set up connections, or perform
-        any other necessary initialization based on the provided configuration.
-
-        Args:
-            config: A dictionary containing configuration parameters for this
-                    extension (e.g., API keys, settings loaded from a central
-                    configuration file).
-        """
-        pass
-
-    @abc.abstractmethod
     async def on_context_request(
         self, source_extension_id: str, context_query: Dict[str, Any]
     ) -> OnContextResponse:
