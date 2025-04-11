@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Type
 from enum import Enum, auto
 
-from extension_interface import ExtensionInterface
+from .extension_interface import ExtensionInterface
 
 
 class BaseExtensionID(Enum):

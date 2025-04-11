@@ -1,7 +1,7 @@
 import abc
 from typing import List, Union, AsyncGenerator, Dict, Any, Optional
 from dataclasses import dataclass
-from llm import LLMModel
+from .llm import LLMModel
 
 
 @dataclass
