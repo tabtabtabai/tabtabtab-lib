@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "tabtabtab-lib"
+version = "0.1.0"
+description = "Core library for TabTabTab functionality"
+authors = ["TabTabTabAI"]
+readme = "README.md"
+packages = [{include = "tabtabtab_lib"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+pydantic = {extras = ["email"], version = "^2.10.6"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+isort = "^5.13.2"
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.5"
+mypy = "^1.8.0"
+ruff = "^0.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+python_version = ">=3.9,<3.13"
+strict = true
+ignore_missing_imports = true
+
+[tool.ruff]
+select = ["E", "F", "B"]
+ignore = [] 
