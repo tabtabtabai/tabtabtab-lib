@@ -13,9 +13,10 @@ class NotificationStatus(Enum):
     """
     Enum representing the status of an extension.
     """
-    PENDING = "pending"           # Extension is running normally
-    READY = "ready"       # Extension is disabled by user/system
-    ERROR = "error"            # Extension encountered an error
+
+    PENDING = "pending"  # Extension is running normally
+    READY = "ready"  # Extension is disabled by user/system
+    ERROR = "error"  # Extension encountered an error
 
 
 @dataclass
@@ -23,6 +24,7 @@ class Notification:
     """
     Data class representing a push notification.
     """
+
     request_id: str
     title: str
     detail: str
@@ -39,11 +41,10 @@ class Notification:
         return {
             "notification_request_id": self.request_id,
             "notification_title": self.title,
-            "notification_detail": self.detail, 
+            "notification_detail": self.detail,
             "notification_content": self.content,
-            "notification_status": self.status.value
+            "notification_status": self.status.value,
         }
-
 
 
 @dataclass
@@ -57,6 +58,7 @@ class CopyResponse:
                        longer-running background task related to this copy event.
                        Defaults to False.
     """
+
     notification: Notification
     is_processing_task: bool = False
 
@@ -74,6 +76,7 @@ class PasteResponse:
     """
     Response object returned by the on_paste method.
     """
+
     notification: Notification
     is_processing_task: bool = False
 
@@ -82,7 +85,7 @@ class PasteResponse:
         Returns True if the paste request is accepted by the extension.
         """
         return self.notification.content is not None or self.is_processing_task
-    
+
     def to_dict(self) -> Dict[str, str]:
         """
         Serializes the PasteResponse to a JSON-compatible dictionary.
@@ -110,7 +113,6 @@ class OnContextResponse:
     contexts: List[ExtensionContext]
 
 
-
 class ExtensionInterface(abc.ABC):
     """
     Abstract Base Class defining the interface for all TabTabTab extensions.
@@ -120,7 +122,10 @@ class ExtensionInterface(abc.ABC):
     """
 
     def __init__(
-        self, sse_sender: SSESenderInterface, llm_processor: LLMProcessorInterface, extension_id: str
+        self,
+        sse_sender: SSESenderInterface,
+        llm_processor: LLMProcessorInterface,
+        extension_id: str,
     ):
         """
         Initializes the SampleExtension.
@@ -203,11 +208,14 @@ class ExtensionInterface(abc.ABC):
         """
         pass
 
-
-    async def send_push_notification(self, device_id: str, notification: Notification) -> None:
+    async def send_push_notification(
+        self, device_id: str, notification: Notification
+    ) -> None:
         """
         Sends a push notification to the user.
         """
         notification_dict = notification.to_dict()
         notification_dict["extension_id"] = self.extension_id
-        await self.sse_sender.send_event(device_id, "extension_notification", notification_dict)
+        await self.sse_sender.send_event(
+            device_id, "extension_notification", notification_dict
+        )
