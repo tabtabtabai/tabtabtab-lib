@@ -18,7 +18,6 @@ class NotificationStatus(Enum):
     READY = "ready"  # Extension is disabled by user/system
     ERROR = "error"  # Extension encountered an error
 
-
 @dataclass
 class Notification:
     """
@@ -46,6 +45,20 @@ class Notification:
             "notification_status": self.status.value,
         }
 
+@dataclass
+class ImmediatePaste:
+    """
+    Data class representing an immediate paste.
+    """
+
+    content: str
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Serializes the ImmediatePaste to a JSON-compatible dictionary.
+        """
+        return {"immediate_paste_content": self.content}
+
 
 @dataclass
 class CopyResponse:
@@ -66,9 +79,12 @@ class CopyResponse:
         """
         Serializes the CopyResponse to a JSON-compatible dictionary.
         """
-        flat_dict = self.notification.to_dict()
-        flat_dict["is_processing_task"] = self.is_processing_task
-        return flat_dict
+        dict = {}
+        if self.notification:
+            dict["notification"] = self.notification.to_dict()
+
+        dict["is_processing_task"] = self.is_processing_task
+        return dict
 
 
 @dataclass
@@ -77,22 +93,28 @@ class PasteResponse:
     Response object returned by the on_paste method.
     """
 
-    notification: Notification
+    paste: Union[ImmediatePaste, Notification]
     is_processing_task: bool = False
 
     def is_accepted(self) -> bool:
         """
         Returns True if the paste request is accepted by the extension.
         """
-        return self.notification.content is not None or self.is_processing_task
+        return self.paste is not None or self.is_processing_task
 
     def to_dict(self) -> Dict[str, str]:
         """
         Serializes the PasteResponse to a JSON-compatible dictionary.
         """
-        flat_dict = self.notification.to_dict()
-        flat_dict["is_processing_task"] = self.is_processing_task
-        return flat_dict
+        dict = {}
+        if isinstance(self.paste, Notification):
+            dict["notification"] = self.paste.to_dict()
+        elif isinstance(self.paste, ImmediatePaste):
+            dict["immediate_paste"] = self.paste.to_dict()
+
+        dict["is_processing_task"] = self.is_processing_task
+
+        return dict
 
 
 @dataclass
