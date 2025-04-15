@@ -18,7 +18,6 @@ class NotificationStatus(Enum):
     READY = "ready"  # Extension is disabled by user/system
     ERROR = "error"  # Extension encountered an error
 
-
 @dataclass
 class Notification:
     """
@@ -46,6 +45,20 @@ class Notification:
             "notification_status": self.status.value,
         }
 
+@dataclass
+class ImmediatePaste:
+    """
+    Data class representing an immediate paste.
+    """
+
+    content: str
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Serializes the ImmediatePaste to a JSON-compatible dictionary.
+        """
+        return {"immediate_paste_content": self.content}
+
 
 @dataclass
 class CopyResponse:
@@ -66,9 +79,12 @@ class CopyResponse:
         """
         Serializes the CopyResponse to a JSON-compatible dictionary.
         """
-        flat_dict = self.notification.to_dict()
-        flat_dict["is_processing_task"] = self.is_processing_task
-        return flat_dict
+        dict = {}
+        if self.notification:
+            dict["notification"] = self.notification.to_dict()
+
+        dict["is_processing_task"] = self.is_processing_task
+        return dict
 
 
 @dataclass
@@ -77,22 +93,22 @@ class PasteResponse:
     Response object returned by the on_paste method.
     """
 
-    notification: Notification
+    paste: Union[ImmediatePaste, Notification]
     is_processing_task: bool = False
-
-    def is_accepted(self) -> bool:
-        """
-        Returns True if the paste request is accepted by the extension.
-        """
-        return self.notification.content is not None or self.is_processing_task
 
     def to_dict(self) -> Dict[str, str]:
         """
         Serializes the PasteResponse to a JSON-compatible dictionary.
         """
-        flat_dict = self.notification.to_dict()
-        flat_dict["is_processing_task"] = self.is_processing_task
-        return flat_dict
+        dict = {}
+        if isinstance(self.paste, Notification):
+            dict["notification"] = self.paste.to_dict()
+        elif isinstance(self.paste, ImmediatePaste):
+            dict["immediate_paste"] = self.paste.to_dict()
+
+        dict["is_processing_task"] = self.is_processing_task
+
+        return dict
 
 
 @dataclass
@@ -145,7 +161,7 @@ class ExtensionInterface(abc.ABC):
     @abc.abstractmethod
     async def on_context_request(
         self, source_extension_id: str, context_query: Dict[str, Any]
-    ) -> OnContextResponse:
+    ) -> Optional[OnContextResponse]:
         """
         Asynchronously handles requests for additional context.
         Extensions can inspect the context_query and return relevant data.
@@ -156,11 +172,12 @@ class ExtensionInterface(abc.ABC):
 
         Returns:
             OnContextResponse object containing a list of ExtensionContext objects.
+            If the extension does not need to provide any context, it should return None.
         """
         pass
 
     @abc.abstractmethod
-    async def on_copy(self, context: Dict[str, Any]) -> CopyResponse:
+    async def on_copy(self, context: Dict[str, Any]) -> Optional[CopyResponse]:
         """
         Handles a 'copy' event triggered by the user.
 
@@ -184,11 +201,12 @@ class ExtensionInterface(abc.ABC):
         Returns:
             A CopyResponse object, potentially containing a message to notify
             the user and indicating if a background task was started.
+            Return None suggests that the extension skips processing the copy event.
         """
         pass
 
     @abc.abstractmethod
-    async def on_paste(self, context: Dict[str, Any]) -> PasteResponse:
+    async def on_paste(self, context: Dict[str, Any]) -> Optional[PasteResponse]:
         """
         Handles a 'paste' event triggered by the user, potentially modifying
         or providing the content to be pasted.
@@ -205,6 +223,7 @@ class ExtensionInterface(abc.ABC):
         Returns:
             A PasteResponse object containing the optional content to paste
             and/or an optional message to notify the user.
+            Return None suggests that the extension skips processing the paste event.
         """
         pass
 
