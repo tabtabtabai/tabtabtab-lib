@@ -96,12 +96,6 @@ class PasteResponse:
     paste: Union[ImmediatePaste, Notification]
     is_processing_task: bool = False
 
-    def is_accepted(self) -> bool:
-        """
-        Returns True if the paste request is accepted by the extension.
-        """
-        return self.paste is not None or self.is_processing_task
-
     def to_dict(self) -> Dict[str, str]:
         """
         Serializes the PasteResponse to a JSON-compatible dictionary.
@@ -167,7 +161,7 @@ class ExtensionInterface(abc.ABC):
     @abc.abstractmethod
     async def on_context_request(
         self, source_extension_id: str, context_query: Dict[str, Any]
-    ) -> OnContextResponse:
+    ) -> Optional[OnContextResponse]:
         """
         Asynchronously handles requests for additional context.
         Extensions can inspect the context_query and return relevant data.
@@ -178,11 +172,12 @@ class ExtensionInterface(abc.ABC):
 
         Returns:
             OnContextResponse object containing a list of ExtensionContext objects.
+            If the extension does not need to provide any context, it should return None.
         """
         pass
 
     @abc.abstractmethod
-    async def on_copy(self, context: Dict[str, Any]) -> CopyResponse:
+    async def on_copy(self, context: Dict[str, Any]) -> Optional[CopyResponse]:
         """
         Handles a 'copy' event triggered by the user.
 
@@ -206,11 +201,12 @@ class ExtensionInterface(abc.ABC):
         Returns:
             A CopyResponse object, potentially containing a message to notify
             the user and indicating if a background task was started.
+            Return None suggests that the extension skips processing the copy event.
         """
         pass
 
     @abc.abstractmethod
-    async def on_paste(self, context: Dict[str, Any]) -> PasteResponse:
+    async def on_paste(self, context: Dict[str, Any]) -> Optional[PasteResponse]:
         """
         Handles a 'paste' event triggered by the user, potentially modifying
         or providing the content to be pasted.
@@ -227,6 +223,7 @@ class ExtensionInterface(abc.ABC):
         Returns:
             A PasteResponse object containing the optional content to paste
             and/or an optional message to notify the user.
+            Return None suggests that the extension skips processing the paste event.
         """
         pass
 
