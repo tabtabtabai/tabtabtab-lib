@@ -162,11 +162,13 @@ class ExtensionInterface(abc.ABC):
             source_extension_id: Currently hardcoded to "tabtabtab_framework"; you can ignore this.
             context_query: A dictionary representing the current state of the application.
                 Common keys include:
+                - 'device_id': str, Unique identifier for the device
+                - 'session_id': str, Identifier for the current session
                 - 'request_id': str, Unique identifier for this specific request
                 - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
                 - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
                 - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
-                - 'session_contents': str, Contents of the current session
+                - 'session_contents': List[SessionContent], Contents of the current session
                 - 'hint': str, Parsed hint information
                 - 'sticky_hint': str, Persistent hint information
 
@@ -189,6 +191,8 @@ class ExtensionInterface(abc.ABC):
         Args:
             context: A dictionary containing information about the copy event.
                      Common keys include:
+                     - 'device_id': str, Unique identifier for the device
+                     - 'session_id': str, Identifier for the current session
                      - 'request_id': str, Unique identifier for this specific request
                      - 'timestamp': str (ISO format UTC), Timestamp of the copy event
                      - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
@@ -215,11 +219,13 @@ class ExtensionInterface(abc.ABC):
         Args:
             context: A dictionary containing information about the paste event.
                      Common keys include:
+                     - 'device_id': str, Unique identifier for the device
+                     - 'session_id': str, Identifier for the current session
                      - 'request_id': str, Unique identifier for this specific request
                      - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
                      - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
                      - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
-                     - 'session_contents': str, Contents of the current session
+                     - 'session_contents': List[SessionContent], Contents of the current session
                      - 'hint': str, Parsed hint information
                      - 'sticky_hint': str, Persistent hint information
 
