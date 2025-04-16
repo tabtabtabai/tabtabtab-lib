@@ -18,6 +18,7 @@ class NotificationStatus(Enum):
     READY = "ready"  # Extension is disabled by user/system
     ERROR = "error"  # Extension encountered an error
 
+
 @dataclass
 class Notification:
     """
@@ -44,6 +45,7 @@ class Notification:
             "notification_content": self.content,
             "notification_status": self.status.value,
         }
+
 
 @dataclass
 class ImmediatePaste:
@@ -160,17 +162,11 @@ class ExtensionInterface(abc.ABC):
 
         Args:
             source_extension_id: Currently hardcoded to "tabtabtab_framework"; you can ignore this.
-            context_query: A dictionary representing the current state of the application.
-                Common keys include:
-                - 'device_id': str, Unique identifier for the device
-                - 'session_id': str, Identifier for the current session
-                - 'request_id': str, Unique identifier for this specific request
-                - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
-                - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
-                - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
-                - 'session_contents': List[SessionContent], Contents of the current session
-                - 'hint': str, Parsed hint information
-                - 'sticky_hint': str, Persistent hint information
+            context_query: A dictionary containing query information.
+                Keys include:
+                - 'query_type': str, Type of context query being made
+                - 'details': str, Description of what context is being requested
+                - 'dependencies': Dict[str, Any], Additional data needed by the extension as defined in the ExtensionDirectory
 
         Returns:
             OnContextResponse object containing a list of ExtensionContext objects.
@@ -190,15 +186,16 @@ class ExtensionInterface(abc.ABC):
 
         Args:
             context: A dictionary containing information about the copy event.
-                     Common keys include:
+                     Keys include:
                      - 'device_id': str, Unique identifier for the device
-                     - 'session_id': str, Identifier for the current session
                      - 'request_id': str, Unique identifier for this specific request
+                     - 'session_id': str, Identifier for the current session
                      - 'timestamp': str (ISO format UTC), Timestamp of the copy event
                      - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
                      - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
                      - 'selected_text': Optional[str], Text that was selected by the user
                      - 'screenshot_data': Optional[bytes] (Raw image data if screenshot_provided is True)
+                     - 'dependencies': Dict[str, Any], Additional data needed by the extension as defined in the ExtensionDirectory
 
         Returns:
             A CopyResponse object, potentially containing a message to notify
@@ -213,22 +210,24 @@ class ExtensionInterface(abc.ABC):
         Handles a 'paste' event triggered by the user.
 
         This method is called when the framework detects a paste action relevant
-        to potentially triggering extensions. The extension can analyze the context 
+        to potentially triggering extensions. The extension can analyze the context
         and decide whether to provide custom content to be pasted.
 
         Args:
             context: A dictionary containing information about the paste event.
-                     Common keys include:
+                     Keys include:
                      - 'device_id': str, Unique identifier for the device
-                     - 'session_id': str, Identifier for the current session
                      - 'request_id': str, Unique identifier for this specific request
+                     - 'timestamp': str (ISO format UTC), Timestamp of the paste event
+                     - 'session_id': str, Identifier for the current session
                      - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
                      - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
                      - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
                      - 'session_contents': List[SessionContent], Contents of the current session
+                     - 'selected_text': Optional[str], Text that was selected by the user
                      - 'hint': str, Parsed hint information
-                     - 'sticky_hint': str, Persistent hint information
-
+                     - 'extension_context': Optional[Dict[str, List[Dict[str, str]]]], Dictionary representing contexts provided by other extensions in key-value string format
+                     - 'dependencies': Dict[str, Any], Additional data needed by the extension as defined in the ExtensionDirectory
         Returns:
             A PasteResponse object containing the optional content to paste
             and/or an optional message to notify the user.
