@@ -156,11 +156,19 @@ class ExtensionInterface(abc.ABC):
     ) -> Optional[OnContextResponse]:
         """
         Asynchronously handles requests for additional context.
-        Extensions can inspect the context_query and return relevant data.
+        Extensions can use the context_query to get information about the current state of the application.
 
         Args:
-            source_extension_id: The ID of the extension or module requesting context.
-            context_query: A dictionary representing the initial context or query.
+            source_extension_id: Currently hardcoded to "tabtabtab_framework"; you can ignore this.
+            context_query: A dictionary representing the current state of the application.
+                Common keys include:
+                - 'request_id': str, Unique identifier for this specific request
+                - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
+                - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
+                - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
+                - 'session_contents': str, Contents of the current session
+                - 'hint': str, Parsed hint information
+                - 'sticky_hint': str, Persistent hint information
 
         Returns:
             OnContextResponse object containing a list of ExtensionContext objects.
@@ -181,13 +189,11 @@ class ExtensionInterface(abc.ABC):
         Args:
             context: A dictionary containing information about the copy event.
                      Common keys include:
-                     - 'device_id': str
-                     - 'session_id': str
-                     - 'request_id': str
-                     - 'timestamp': str (ISO format UTC)
-                     - 'window_info': Dict[str, Any] (parsed window info)
-                     - 'screenshot_provided': bool
-                     - 'selected_text': Optional[str]
+                     - 'request_id': str, Unique identifier for this specific request
+                     - 'timestamp': str (ISO format UTC), Timestamp of the copy event
+                     - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
+                     - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
+                     - 'selected_text': Optional[str], Text that was selected by the user
                      - 'screenshot_data': Optional[bytes] (Raw image data if screenshot_provided is True)
 
         Returns:
@@ -200,17 +206,22 @@ class ExtensionInterface(abc.ABC):
     @abc.abstractmethod
     async def on_paste(self, context: Dict[str, Any]) -> Optional[PasteResponse]:
         """
-        Handles a 'paste' event triggered by the user, potentially modifying
-        or providing the content to be pasted.
+        Handles a 'paste' event triggered by the user.
 
-        This method is called when the framework routes a paste action to this
-        specific extension. The extension can analyze the context and decide
-        whether to provide custom content to be pasted.
+        This method is called when the framework detects a paste action relevant
+        to potentially triggering extensions. The extension can analyze the context 
+        and decide whether to provide custom content to be pasted.
 
         Args:
-            context: A dictionary containing information about the paste event,
-                     such as the target application, active URL, current
-                     clipboard content (if available), etc.
+            context: A dictionary containing information about the paste event.
+                     Common keys include:
+                     - 'request_id': str, Unique identifier for this specific request
+                     - 'window_info': Dict[str, Any], Dictionary containing information about the active window; contains the url if the active window is a browser
+                     - 'screenshot_provided': bool, Boolean indicating if a screenshot is available
+                     - 'screenshot_data': Optional[bytes], Raw image data when a screenshot is provided
+                     - 'session_contents': str, Contents of the current session
+                     - 'hint': str, Parsed hint information
+                     - 'sticky_hint': str, Persistent hint information
 
         Returns:
             A PasteResponse object containing the optional content to paste
