@@ -67,13 +67,9 @@ class CopyResponse:
 
     Attributes:
         notification: Notification object to be sent to the user.
-        is_processing_task: Boolean indicating if the extension has started a
-                       longer-running background task related to this copy event.
-                       Defaults to False.
     """
 
     notification: Notification
-    is_processing_task: bool = False
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -83,7 +79,6 @@ class CopyResponse:
         if self.notification:
             dict["notification"] = self.notification.to_dict()
 
-        dict["is_processing_task"] = self.is_processing_task
         return dict
 
 
@@ -94,7 +89,6 @@ class PasteResponse:
     """
 
     paste: Union[ImmediatePaste, Notification]
-    is_processing_task: bool = False
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -105,8 +99,6 @@ class PasteResponse:
             dict["notification"] = self.paste.to_dict()
         elif isinstance(self.paste, ImmediatePaste):
             dict["immediate_paste"] = self.paste.to_dict()
-
-        dict["is_processing_task"] = self.is_processing_task
 
         return dict
 
