@@ -15,6 +15,8 @@ class SSESenderInterface(abc.ABC):
     ) -> None:
         """
         Sends an event payload to a specific device's SSE connection.
+        This method is called internally by the framework to send events to the client.
+        Users should use the `send_push_notification` method in the ExtensionInterface to send push notifications to the client.
 
         Args:
             device_id: The target device ID.

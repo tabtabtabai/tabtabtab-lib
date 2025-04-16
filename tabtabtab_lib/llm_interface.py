@@ -29,7 +29,6 @@ class LLMProcessorInterface(abc.ABC):
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
-        # Add other common parameters if needed
     ) -> Union[str, AsyncGenerator[str, None]]:
         """
         Processes the given message and context using the specified LLM.
@@ -50,6 +49,3 @@ class LLMProcessorInterface(abc.ABC):
             If stream is True, returns an async generator yielding response chunks.
         """
         pass
-
-    # Potentially add other methods if extensions need more specific LLM interactions,
-    # e.g., get_embeddings, specific tool usage, etc.
