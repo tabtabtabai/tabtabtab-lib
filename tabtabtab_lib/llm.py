@@ -16,13 +16,19 @@ class LLMModel(str, Enum):
     GEMINI_PRO2 = "gemini-2.0-pro-exp"
     GEMINI_PRO_2_5 = "gemini-2.5-pro-exp-03-25"
     GEMINI_FLASH2_EXP = "gemini-2.0-flash-exp"
+    GEMINI_FLASH_2_0 = "gemini-2.0-flash"
     GEMINI_FLASH_2_IMAGE_GEN = "gemini-2.0-flash-exp-image-generation"
+    GEMINI_FLASH_2_5 = "gemini-2.5-flash-preview-04-17"
 
     # Anthropic models
     ANTHROPIC_HAIKU = "claude-3-5-haiku-latest"
 
     OPENAI_MINI = "gpt-4o-mini"
     OPENAI_FULL = "gpt-4o"
+    OPENAI_GPT_4_1 = "gpt-4.1"
+    OPENAI_GPT_O4_MINI = "o4-mini"
+    OPENAI_GPT_O3 = "o3"
+    OPENAI_GPT_O3_MINI = "o3-mini"
 
     @property
     def provider(self) -> str:
